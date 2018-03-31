@@ -8,6 +8,7 @@
 	$data= date('Y-m-d H:i:s', strtotime($GMT. 'hours'));
 	include 'classes.php';
 	include 'funcoes.php';
+	//include 'javascript.php';
 	echo '
 	<!DOCTYPE html>
 	<html lang="pt-br">
@@ -107,7 +108,7 @@
 				exit();
 			};
 			echo"<table class='' style='width:100%;'>
-					<tr style='background-color:rgba(0, 255, 188, 0.09)'>
+					<tr style='background-color:rgba(0, 255, 188, 0.09);box-shadow:none'>
 						<td><strong>Data</strong></td><td><strong>Temp Cº</strong></td><td><strong>Umid %</strong></td>
 					</tr>";
 			while ($r = mysqli_fetch_array($query)) {
@@ -535,18 +536,16 @@
 
 			if($exec == 'consultar'){
 				echo"
-			<div class='row'>
-				<div id='itemDivTitulo' >
-					<div >
-						<p style='margin:10px 0 0 0; font-size:18px;'>
-							<i class='fa fa-' aria-hidden='true' style='font-size:22px;color:whrite;margin:0px 0 0 0 ;'></i>
-								Comandos Cadastrado
-						</p>
+				<div class='row'>
+					<div id='itemDivTitulo' >
+						<div >
+							<p style='margin:10px 0 0 0; font-size:18px;'>
+								<i class='fa fa-' aria-hidden='true' style='font-size:22px;color:whrite;margin:0px 0 0 0 ;'></i>
+									Comandos Cadastrado
+							</p>
+						</div>
 					</div>
-				</div>
-			</div>
-
-				</br>";
+				</div></br>";
 				$querySql ='SELECT * FROM itens';
 				if(!$query = $mysqli->query($querySql)){
 					echo "Errorcode: ".$mysqli->errno;
@@ -871,6 +870,286 @@
 			voltar('?id=configurar');
 			exit;
 		}
+		if($setor == 'Agendamento'){
+			if($exec == 'novoAgendamento'){
+				foreach($_GET as $key=>$value){
+					$recebido[$key] = $value;
+				}
+				$querySql ='SELECT * FROM itens where acao in ("lampada","tomada")';
+				if(!$query = $mysqli->query($querySql)){
+					echo "Errorcode: ".$mysqli->errno;
+					echo "<br>Errormessage: ".$mysqli->error;
+					$log_registro = "Errorcode: ".$mysqli->errno." Errormessage: ".$mysqli->error;
+					Log_error($log_registro,$data);
+					exit();
+				}
+				$option = '';
+				while($r = mysqli_fetch_assoc($query)){
+					$i = $r['central'].'|'.$r['porta'];
+					if(isset($recebido['central'])){
+						if($recebido['central'] == $i){
+							$checked = 'selected';
+						}else{
+							$checked = '';
+						}
+					}else{
+						$checked = '';
+					}
+					$option.="<option value='$r[central]|$r[porta]' $checked>".$r['comodo'].' - '.$r['nome']."</option>";
+				}
+				echo"
+				<div class='row'>
+					<div id='itemDivTitulo' >
+						<div >
+							<p style='margin:10px 0 0 0; font-size:18px;'>
+								Novo Agendamento
+							</p>
+						</div>
+					</div>
+				</div>";
+				echo"
+				<div class='row'>
+				<div id='itemDivPainel'>
+					<form method='POST' action='?id=configurar&setor=Agendamento&exec=inserir'/> 
+						<table style=\"width:100%;height:50%\">
+							<tr>
+								<td width=\"10%\">
+									Deseja controlar?
+								</td>
+								<td width=\"90%\">
+										<select class='form-control' style='font-size:10px; padding:0px;' name='item'>
+											<option value=''>----</option>
+											$option
+										</select>
+								</td>
+							</tr>
+							<tr>
+								<td width=\"10%\">
+									Qual a ação a ser executada?
+								</td>
+								<td width=\"90%\">
+										<select class='form-control' style='font-size:10px; padding:0px;' name='acao'>
+											<option value=''>----</option>
+											<option value='liga'>Ligar</option>
+											<option value='desligar'>Desligar</option>
+											<option value='pulso'>Pulsar</option>
+										</select>
+								</td>
+								</tr>
+							<tr>
+								<td colspan=\"\" style=\"aligin:left;\">	
+									<p>Segunda</p> 
+									<p>Terça</p> 
+									<p>Quarta</p> 
+									<p>Quinta</p> 
+									<p>Sexta</p> 
+									<p>Sábado</p> 
+									<p>Domingo</p> 
+								</td>
+									<p><td colspan=\"\" style=\"aligin:left;\">
+									<p><input type='checkbox' name='segunda'  value='1'></p>
+									<p><input type='checkbox' name='terca'  value='1'></p>
+									<p><input type='checkbox' name='quarta'  value='1'></p>
+									<p><input type='checkbox' name='quinta'  value='1'></p>
+									<p><input type='checkbox' name='sexta'  value='1'></p>
+									<p><input type='checkbox' name='sabado'  value='1'></p>
+									<p><input type='checkbox' name='domingo'  value='1'></p>
+								</td>
+							</tr>
+							<tr>
+								<td colspan=\"2\" >	
+									Horário <input style='color:black;' type='time' name='hora1' size='' value=''> até <input style='color:black;' type='time' name='hora2' size='' value=''>
+								</td>
+							</tr>
+							<tr>
+								<td>
+								</td>
+								<td>
+									<input class=\"btn btn-success\" type='submit' name='Submit' value='Gravar'>
+								</td>	
+						<table>
+					</form>
+					</div>
+				</div>";
+				
+				exit;
+			}			
+			if($exec == 'inserir'){
+				foreach($_POST as $key=>$value){
+					$postDados[$key] = $value;
+				}
+				$pos = strpos($postDados['item'], "|");
+				$ip = substr($postDados['item'],0,$pos);
+				$porta = substr(strrchr($postDados['item'],"|"),1);
+				$dias;
+				if(isset($postDados['segunda'])){
+						$dias ="segunda;"; 
+				}
+				if(isset($postDados['terca'])){
+						$dias .="terca;"; 
+				}
+				if(isset($postDados['quarta'])){
+						$dias .="quarta;"; 
+				}
+				if(isset($postDados['quinta'])){
+						$dias .="quinta;"; 
+				}
+				if(isset($postDados['sexta'])){
+						$dias .="sexta;"; 
+				}
+				if(isset($postDados['sabado'])){
+						$dias .="sabado;"; 
+				}
+				if(isset($postDados['domingo'])){
+						$dias .="domingo;"; 
+				}
+				//print_r($postDados);
+				//print_r($dias);
+				
+				/* $querySqlPorta = "select * from itens where porta ='$postDados[porta]' and central = '$postDados[central]'";
+				if(!$query = $mysqli->query($querySqlPorta)){
+					echo "Errorcode: ".$mysqli->errno;
+					echo "<br>Errormessage: ".$mysqli->error;
+					$log_registro = "Errorcode: ".$mysqli->errno." Errormessage: ".$mysqli->error;
+					Log_error($log_registro,$data);
+					exit();
+				};
+				$r = mysqli_fetch_row($query);
+				if($r >= 1){
+					echo '
+					<br>
+					<div class="alert alert-danger" role="alert">
+						<strong>Atenção:</strong> 
+						A porta '.$postDados['porta'].' que esta tentando utilizar já esta ocupada, utilize outra porta da central!!!"
+					</div>';
+					voltar('?id=configurar&setor=novoComando');
+					exit;
+				} */
+				//
+				$querySql ="INSERT INTO `agendamentos`(`id_agenda`, `central`, `porta`, `acao`, `dias`, `hora1`, `hora2`, `status`) VALUES ('','$ip','$porta','$postDados[acao]','$dias','$postDados[hora1]','$postDados[hora2]',1)";
+				
+				if(!$query = $mysqli->query($querySql)){
+					echo "Errorcode: ".$mysqli->errno;
+					echo "<br>Errormessage: ".$mysqli->error;
+					$log_registro = "Errorcode: ".$mysqli->errno." Errormessage: ".$mysqli->error;
+					Log_error($log_registro,$data);
+					exit();
+				};
+				LogBanco($querySql,$data);
+			}
+			if($exec == 'excluir'){
+				foreach($_REQUEST as $key=>$value){
+					$excluirDados[$key] = $value;
+				}
+				echo $querySql ="delete from agendamentos where id_agenda = '$excluirDados[id_agenda]'";
+				if(!$query = $mysqli->query($querySql)){
+					echo "Errorcode: ".$mysqli->errno;
+					echo "<br>Errormessage: ".$mysqli->error;
+					$log_registro = "Errorcode: ".$mysqli->errno." Errormessage: ".$mysqli->error;
+					Log_error($log_registro,$data);
+					exit();
+				};
+				
+				header("location:?id=configurar&setor=Agendamento&exec=consultar");
+			}
+			if($exec == 'consultar'){
+				echo"
+			<div class='row'>
+				<div id='itemDivTitulo'>
+					<div >
+						<p style='margin:10px 0 0 0; font-size:18px;'>
+							<i class='fa fa-' aria-hidden='true' style='font-size:22px;color:whrite;margin:0px 0 0 0 ;'></i>
+								Agendamentos Cadastrados
+						</p>
+					</div>
+				</div>
+			</div>
+				</br>";
+				$querySql ="SELECT a.id_agenda, a.central, a.porta, i.comodo, i.nome, i.type, a.acao,a.dias, TIME_FORMAT(a.hora1, '%h:%i') as hora1, TIME_FORMAT(a.hora2, '%h:%i') as hora2, a.status FROM agendamentos a, itens i WHERE a.central = i.central and a.porta = i.porta";
+				if(!$query = $mysqli->query($querySql)){
+					echo "Errorcode: ".$mysqli->errno;
+					echo "<br>Errormessage: ".$mysqli->error;
+					$log_registro = "Errorcode: ".$mysqli->errno." Errormessage: ".$mysqli->error;
+					Log_error($log_registro,$data);
+					exit();
+				};
+				echo"<div class='row'> 
+						<div id='itemDivPainel2'>
+							<table style='width: 100%; margin: 0 auto; padding:0px; font-size:8px;'>
+								<tr style='background-color:rgba(0, 255, 188, 0.09)'>
+									<td><strong>Cômodo</strong></td>
+									<td><strong>Dias</strong></td><td><strong>Ação</strong></td><td><strong>Inicio</strong></td><td><strong>Final</strong></td><td><strong>Status</strong></td><td><strong></strong></td>
+								</tr>";
+									while ($r = mysqli_fetch_array($query)) {
+										echo"<tr  style='font-size:10px;'><td><strong>";
+										echo $r['comodo'].'/'.$r['nome'];									
+										echo"</strong></td><td><strong>";
+										$d = explode(';',$r['dias']);
+										//print_r($d);
+										$dias = '';
+										if (in_array('segunda',$d) ? $dias .="Segunda<br>" : $dias .="");
+										if (in_array('terça',$d) ? $dias .="Terça<br>" : $dias .="");
+										if (in_array('quarta',$d) ? $dias .="Quarta<br>" : $dias .="");
+										if (in_array('quinta',$d) ? $dias .="Quinta<br>" : $dias .="");
+										if (in_array('sexta',$d) ? $dias .="Sexta<br>" : $dias .="");
+										if (in_array('sabado',$d) ? $dias .="Sábado<br>" : $dias .="");
+										if (in_array('domingo',$d) ? $dias .="Domingo<br>" : $dias .="");
+										//print_r($dias);
+										
+										echo $dias;					
+										echo"</strong></td><td><strong>";
+										if($r['acao'] == 'liga'){
+											$acao = "Ligar";
+										}else if($r['acao'] == 'desligar'){
+											$acao = "Desligar";
+										}else if($r['acao'] == 'pulso'){
+											$acao = "Pulso";
+										}else{
+											$acao = "N. Cad";
+										}
+										echo $acao;					
+										echo"</strong></td><td><strong>";
+										echo $r['hora1'];					
+										echo"</strong></td><td><strong>";
+										echo $r['hora2'];					
+										echo"</strong></td><td><strong>";
+										if($r['status'] == 1 ? $status = "Ativo" : $status = "Inativo") 
+										echo $status;					
+										echo"</strong></td><td><a href='?id=configurar&setor=Agendamento&exec=excluir&id_agenda=$r[id_agenda]'><img src='ico/apagar.png' style='width:25px;'/></a></td></tr>";
+										}
+						echo"</table>
+					</div>
+				</div>";
+ 				voltar('?id=configurar&setor=Agendamento');
+				exit;
+			}
+			echo"
+			<div class='row'>
+				<div id='itemDiv' >
+					<div >
+					<a href='?id=configurar&setor=Agendamento&exec=consultar'>
+						<p style='margin:10px 0 0 0; font-size:18px;'>
+						<i class='fa fa-' aria-hidden='true' style='font-size:22px;color:whrite;margin:0px 0 0 0 ;'></i>
+						Agendamentos
+						</p>
+					</div>
+					</a>
+				</div>
+			</div>
+			<div class='row'>
+				<div id='itemDiv' >
+					<a href='?id=configurar&setor=Agendamento&exec=novoAgendamento'>
+					<div >
+						<p style='margin:10px 0 0 0; font-size:18px;'>
+						<i class='fa fa-' aria-hidden='true' style='font-size:22px;color:whrite;margin:0px 0 0 0 ;'></i>
+						Novo Agendamento
+						</p>
+					</div>
+					</a>
+				</div>
+			</div>";
+		  exit;
+		}
 		echo"
 			<div class='row'>
 			<div id='itemDiv' >
@@ -903,6 +1182,17 @@
 					<p style='margin:10px 0 0 0; font-size:18px;'>
 					<i class='fa fa' aria-hidden='true' style='font-size:22px;color:whrite;margin:0px 0 0 0 ;'></i>
 						Configurar Ação
+					</p>
+				</div>
+			</div>
+		</div>
+		<div class='row'>
+		<a href='?id=configurar&setor=Agendamento'>
+			<div id='itemDiv' >
+				<div >
+					<p style='margin:10px 0 0 0; font-size:18px;'>
+					<i class='fa fa' aria-hidden='true' style='font-size:22px;color:whrite;margin:0px 0 0 0 ;'></i>
+						Agendamentos
 					</p>
 				</div>
 			</div>
@@ -980,7 +1270,9 @@
 			//print_r(count($lampadaCad));
 			//echo "<br>";			
 			//print_r($tomadaCad);
-			echo "<br>";
+			echo "
+			<div class='row'>
+				<div id='itemDivPainel' >";
  			if(isset($sensorCad)){
 				if($sensorCad['dht11'][2] == 'dht11'){
 					$central = $sensorCad['dht11'][3];
@@ -1084,6 +1376,9 @@
 								$input
 								$span
 							</td>
+							<td>
+								<a href='http://127.0.0.1/arduino/index.php?id=configurar&setor=Agendamento&exec=novoAgendamento&central=$central|$porta'><img src=\"ico/relogio.png\" width=\"30\" height=\"30\" alt=\"Agendar Tarefa\" title=\"Agendar Tarefa\"></a>
+							</td>
 						</tr>";
 				}
 				echo "</table>";
@@ -1132,9 +1427,13 @@
 								$input
 								$span
 							</td>
+							<td>
+								<a href='http://127.0.0.1/arduino/index.php?id=configurar&setor=Agendamento&exec=novoAgendamento&central=$central|$porta'><img src=\"ico/relogio.png\" width=\"30\" height=\"30\" alt=\"Agendar Tarefa\" title=\"Agendar Tarefa\"></a>
+							</td>
 						</tr>";
 				}
-				echo "</table>";
+				echo "</table>
+					</div>";
 			}
 			
 			
@@ -1215,8 +1514,8 @@
 					Lâmpadas
 				</p>
 			</div>";
-		echo "<div id='itemDivDetalhe2' >
-				<div >
+		echo "<div class='row' >
+				<div id='itemDivPainel' >
 					<table>";
 		$n=0;
 		$portasInterruptor = 0;
@@ -1250,7 +1549,7 @@
 			$nPorta = 0;
 			if($type == 'checkbox'){
 				$portasInterruptor.=';'.$chamadaGet;
-				$atributos = "onclick=\"verificarCheckBox('$chamadaGet','$central')\" name='$chamadaGet' $check";
+				$atributos = "onclick=\"verificarCheckBox('$chamadaGet','$central','$chamadaGet')\" name='$chamadaGet' $check";
 				$classe ="<label class='switch'>";
 				$input = "<input type='$type' $atributos/>";
 				$span = "<span class='slider round'></span></label>";
@@ -1277,6 +1576,9 @@
 						$classe
 						$input
 						$span
+					</td>
+					<td>
+						<a href='index.php?id=configurar&setor=Agendamento&exec=novoAgendamento&central=$central|$chamadaGet'><img src=\"ico/relogio.png\" width=\"30\" height=\"30\" alt=\"Agendar Tarefa\" title=\"Agendar Tarefa\"></a>
 					</td>
 				</tr>
 			";
@@ -1358,7 +1660,7 @@
 						Tomadas
 				</p>
 			</div>";
-		echo "<div id='itemDivDetalhe2' >
+		echo "<div id='itemDivPainel' >
 				<div >
 					<table>";
 		$n=0;
@@ -1394,7 +1696,7 @@
 			$nPorta = 0;
 			if($type == 'checkbox'){
 				$portasInterruptor.=';'.$chamadaGet;
-				$atributos = "onclick=\"verificarCheckBox('$chamadaGet','$central')\" name='$chamadaGet' $check";
+				$atributos = "onclick=\"verificarCheckBox('$chamadaGet','$central','$chamadaGet')\" name='$chamadaGet' $check";
 				$classe ="<label class='switch'>";
 				$input = "<input type='$type' $atributos/>";
 				$span = "<span class='slider round'></span></label>";
@@ -1423,6 +1725,10 @@
 						$input
 						$span
 					</td>
+					<td>
+						<a href='index.php?id=configurar&setor=Agendamento&exec=novoAgendamento&central=$central|$chamadaGet'><img src=\"ico/relogio.png\" width=\"30\" height=\"30\" alt=\"Agendar Tarefa\" title=\"Agendar Tarefa\"></a>
+					</td>
+					
 				</tr>
 			";
 		}
@@ -1467,6 +1773,7 @@
 		voltar('?id=menu');
 		exit;
 	}
+	//print_r($_SERVER);
 	?>
 </div>
 </body>

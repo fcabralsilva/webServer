@@ -303,7 +303,7 @@
 					Log_error($log_registro,$data);
 					exit();
 				};
-				LogBanco($querySql,$data);
+				//LogBanco($querySql,$data);
 
 			}
 			if($exec == 'excluir'){
@@ -318,7 +318,7 @@
 					$log_registro = "Errorcode: ".$mysqli->errno." Errormessage: ".$mysqli->error;
 					Log_error($log_registro,$data);
 				};
-				LogBanco($querySql,$data);
+				//LogBanco($querySql,$data);
 				$querySql ="delete from itens where central = '$excluirDados[ip]'";
 				if(!$query = $mysqli->query($querySql)){
 					echo "Errorcode: ".$mysqli->errno;
@@ -326,7 +326,7 @@
 					$log_registro = "Errorcode: ".$mysqli->errno." Errormessage: ".$mysqli->error;
 					Log_error($log_registro,$data);
 				}; 
-				LogBanco($querySql,$data);
+				//LogBanco($querySql,$data);
 				$querySql ="UPDATE `parametro` SET `valor` = '0' WHERE `parametro` = 'termometroPrincipal'and valor ='$excluirDados[ip]'";
 				if(!$query = $mysqli->query($querySql)){
 					echo "Errorcode: ".$mysqli->errno;
@@ -334,7 +334,7 @@
 					$log_registro = "Errorcode: ".$mysqli->errno." Errormessage: ".$mysqli->error;
 					Log_error($log_registro,$data);
 				};
-				LogBanco($querySql,$data);
+				//LogBanco($querySql,$data);
 				$querySql ="delete from sensores where central = '$excluirDados[ip]'";
 				if(!$query = $mysqli->query($querySql)){
 					echo "Errorcode: ".$mysqli->errno;
@@ -342,7 +342,7 @@
 					$log_registro = "Errorcode: ".$mysqli->errno." Errormessage: ".$mysqli->error;
 					Log_error($log_registro,$data);
 				};
-				LogBanco($querySql,$data);
+				//LogBanco($querySql,$data);
 				$querySql ="delete from portasoutput where central = '$excluirDados[ip]'";
 				if(!$query = $mysqli->query($querySql)){
 					echo "Errorcode: ".$mysqli->errno;
@@ -351,7 +351,7 @@
 					Log_error($log_registro,$data);
 					exit();
 				};
-				LogBanco($querySql,$data);
+				//LogBanco($querySql,$data);
 				header("location:?id=configurar&setor=novaCentral&exec=consultar");
 			}
 			echo"
@@ -479,7 +479,7 @@
 					Log_error($log_registro,$data);
 					exit();
 				};
-				LogBanco($querySql,$data);
+				//LogBanco($querySql,$data);
 
 			}
 			if($exec == 'excluir'){
@@ -618,7 +618,7 @@
 					Log_error($log_registro,$data);
 					exit();
 				};
-				LogBanco($querySql,$data);
+				//LogBanco($querySql,$data);
 
 			}
 			if($exec == 'excluir'){
@@ -754,7 +754,7 @@
 					Log_error($log_registro,$data);
 					exit();
 				};
-				LogBanco($querySql,$data);
+				//LogBanco($querySql,$data);
 				header("Location:index.php?id=configurar&setor=parametros");
 			}
 			if($exec == 'updateTermometro'){
@@ -767,7 +767,7 @@
 					Log_error($log_registro,$data);
 					exit();
 				};
-				LogBanco($querySql,$data);
+				//LogBanco($querySql,$data);
 				header("Location:index.php?id=configurar&setor=parametros");			
 			}
 			if($exec == 'desativar'){
@@ -779,7 +779,7 @@
 					Log_error($log_registro,$data);
 					exit();
 				};
-				LogBanco($querySql,$data);
+				//LogBanco($querySql,$data);
 				header("Location:index.php?id=configurar&setor=parametros");
 				}
 			if($exec == 'deletar'){
@@ -1035,7 +1035,7 @@
 					Log_error($log_registro,$data);
 					exit();
 				};
-				LogBanco($querySql,$data);
+				//LogBanco($querySql,$data);
 			}
 			if($exec == 'excluir'){
 				foreach($_REQUEST as $key=>$value){
@@ -1604,7 +1604,7 @@
 				};
 			echo"
 			<script>location.href=('?id=lampadas');</script>";
-			LogBanco($querySql,$data);
+			//LogBanco($querySql,$data);
 		}
 		if ($exec == 'desativar'){
 			foreach($_GET as $key=>$value){
@@ -1623,7 +1623,7 @@
 				};
 			echo"
 			<script>location.href=('?id=lampadas');</script>";
-			LogBanco($querySql,$data);
+			//LogBanco($querySql,$data);
 
 		}
 		voltar('?id=menu');

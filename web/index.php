@@ -5,6 +5,7 @@
 	$com	= addslashes(isset($_GET['com']) ? $_GET['com'] : '');
 	$exec	= addslashes(isset($_GET['exec']) ? $_GET['exec'] : '');
 	$GMT = -3;
+	$nivelGas = 900;
 	$data= date('Y-m-d H:i:s', strtotime($GMT. 'hours'));
 	include 'classes.php';
 	include 'funcoes.php';
@@ -91,14 +92,12 @@
 			<div class='row'>
 				<div id='itemDivTitulo' >
 					<div >
-						<p style='margin:10px 0 0 0; font-size:18px;'>
-								Histórico
+						<p style='margin:0; font-size:18px;'>
+							Histórico
 						</p>
 					</div>
 				</div>
-
-			</div>
-			</br>";
+			</div>";
 			$querySql ="SELECT date_format(data,'%d/%m %h:%i') as data, valor FROM sensores where central = '$centralTermometro[valor]' and tipo='dht11' order by data desc limit 25";
 			if(!$query = $mysqli->query($querySql)){
 				echo "Errorcode: ".$mysqli->errno;
@@ -107,25 +106,28 @@
 				Log_error($log_registro,$data);
 				exit();
 			};
-			echo"<table class='' style='width:100%;'>
-					<tr style='background-color:rgba(0, 255, 188, 0.09);box-shadow:none'>
-						<td><strong>Data</strong></td><td><strong>Temp Cº</strong></td><td><strong>Umid %</strong></td>
-					</tr>";
-			while ($r = mysqli_fetch_array($query)) {
-				$data=$r['data'];
-				$valor= explode(";",$r['valor']);
-				echo"<tr id='trnone'><td><strong>";
-				echo $data;
-				echo"</strong></td><td><strong>";
-				echo $valor[1];
-				echo"</strong></td><td><strong>";
-				echo $valor[2];
-				echo"</strong></td></td>";
-			}
-			echo"</table>";
+			echo"<div id='itemDivPainel'>
+					<table class='' style='width:100%;'>
+						<tr style='background-color:rgba(0, 255, 188, 0.09);box-shadow:none'>
+							<td><strong>Data</strong></td><td><strong>Temp Cº</strong></td><td><strong>Umid %</strong></td>
+						</tr>";
+						while ($r = mysqli_fetch_array($query)) {
+							$data=$r['data'];
+							$valor= explode(";",$r['valor']);
+							echo"<tr id='trnone'><td><strong>";
+							echo $data;
+							echo"</strong></td><td><strong>";
+							echo $valor[1];
+							echo"</strong></td><td><strong>";
+							echo $valor[2];
+							echo"</strong></td></td>";
+						}
+					echo"
+					</table>
+				</div>";
 
-			voltar('?id=menu');
-			exit;
+						voltar('?id=menu');
+						exit;
 		}
 		echo "
 		<script>
@@ -136,7 +138,7 @@
 				<div id='itemDiv'>
 					<div style='line-height:0;'>
 						<p>
-							<img src='ico/termometro.png' style='width:12px;'/> $tempPrincipal ºC
+							<img src='ico/termometro.png' style='width:28px;'/> $tempPrincipal ºC
 							<img src='ico/nuvem.png' style='width:20px;'/> $umidadePrincipal %
 						</p>
 						<p>
@@ -224,14 +226,13 @@
 			<div class='row'>
 				<div id='itemDivTitulo' >
 					<div >
-						<p style='margin:10px 0 0 0; font-size:18px;'>
+						<p style='font-size:18px;'>
 							<i class='fa fa-' aria-hidden='true' style='font-size:22px;color:whrite;margin:0px 0 0 0 ;'></i>
 								Centrais Cadastradas
 						</p>
 					</div>
 				</div>
-			</div>
-				</br>";
+			</div>";
 				$querySql ='SELECT * FROM central';
 				if(!$query = $mysqli->query($querySql)){
 					echo "Errorcode: ".$mysqli->errno;
@@ -241,8 +242,10 @@
 					exit();
 				};
 				$campoChave = array('nome', 'ip', 'porta');
-				echo"<table id='tabela1' class='ta ble'>
-						<tr style='background-color:rgba(0, 255, 188, 0.09)'>
+				echo"
+				<div id='itemDivPainel'>
+					<table id='tabela1'>
+						<tr style='background-color:rgba(0, 255, 188, 0.09); aligin:cente;'>
 							<td><strong>Nome</strong></td><td><strong>IP</strong></td><td><strong>Porta</strong></td><td></td>
 						</tr>";
 				while ($r = mysqli_fetch_array($query)) {
@@ -254,7 +257,8 @@
 					echo $r['porta'];
 					echo"</strong></td><td><a href='?id=configurar&setor=novaCentral&exec=excluir&ip=$r[ip]'><img src='ico/apagar.png' style='width:25px;'/></a></td></tr>";
 				}
-				echo"</table>";
+				echo"</table>
+				</div>";
  				voltar('?id=configurar&setor=novaCentral');
 				exit;
 			}
@@ -406,14 +410,13 @@
 			<div class='row'>
 				<div id='itemDivTitulo' >
 					<div >
-						<p style='margin:10px 0 0 0; font-size:18px;'>
+						<p style='font-size:18px;'>
 							<i class='fa fa-' aria-hidden='true' style='font-size:22px;color:whrite;margin:0px 0 0 0 ;'></i>
-							Comôdos Cadastrados
+							Cômodos Cadastrados
 						</p>
 					</div>
 				</div>
-			</div>
-				</br>";
+			</div>";
 				$querySql ='SELECT * FROM comodos';
 				if(!$query = $mysqli->query($querySql)){
 					echo "Errorcode: ".$mysqli->errno;
@@ -423,20 +426,19 @@
 					exit();
 				};
 				$campoChave = array('id_comodo', 'nome', 'data');
-				echo"<table class=''>
+				echo"<div id='itemDivPainel'>
+				<table class=''>
 						<tr style='background-color:rgba(0, 255, 188, 0.09)'>
-							<td><strong>ID</strong></td><td><strong>Comôdo</strong></td><td></td>
+							<td><strong>ID</strong></td><td><strong>Cômodo</strong></td><td></td>
 						</tr>";
 				while ($r = mysqli_fetch_array($query)) {
 					echo"<tr><td><strong>";
 					echo $r['id_comodo'];
 					echo"</strong></td><td><strong>";
 					echo $r['nome'];
-/* 					echo"</strong></td><td><strong>";
-					echo $r['data']; */
 					echo"</strong></td><td><a href='?id=configurar&setor=novoComodo&exec=excluir&id_comodo=$r[id_comodo]'><img src='ico/apagar.png' style='width:25px;'/></a></td></tr>";
 				}
-				echo"</table>";
+				echo"</div></table>";
  				voltar('?id=configurar&setor=novoComodo');
 				exit;
 			}
@@ -539,13 +541,13 @@
 				<div class='row'>
 					<div id='itemDivTitulo' >
 						<div >
-							<p style='margin:10px 0 0 0; font-size:18px;'>
+							<p style='font-size:18px;'>
 								<i class='fa fa-' aria-hidden='true' style='font-size:22px;color:whrite;margin:0px 0 0 0 ;'></i>
-									Comandos Cadastrado
+									Comandos Cadastrados
 							</p>
 						</div>
 					</div>
-				</div></br>";
+				</div>";
 				$querySql ='SELECT * FROM itens';
 				if(!$query = $mysqli->query($querySql)){
 					echo "Errorcode: ".$mysqli->errno;
@@ -555,7 +557,7 @@
 					exit();
 				};
 				$campoChave = array('nome', 'ip', 'porta');
-				echo"<table>
+				echo"<div id='itemDivPainel'><table>
 						<tr style='background-color:rgba(0, 255, 188, 0.09);font-size:9px'>
 							<td><strong>item</strong></td><td><strong>Tipo</strong></td><td><strong>IP Central</strong></td><td><strong>Porta</strong></td><td></td>
 						</tr>";
@@ -581,7 +583,7 @@
 					echo $r['porta'];
 					echo"</strong></td><td><a href='?id=configurar&setor=novoComando&exec=excluir&data=$r[data]'><img src='ico/apagar.png' style='width:25px;'/></a></td></tr>";
 				}
-				echo"</table>";
+				echo"</table></div>";
  				voltar('?id=configurar&setor=novoComando');
 				exit;
 			}
@@ -1026,7 +1028,7 @@
 					exit;
 				} */
 				//
-				$querySql ="INSERT INTO `agendamentos`(`id_agenda`, `central`, `porta`, `acao`, `dias`, `hora1`, `hora2`, `status`) VALUES ('','$ip','$porta','$postDados[acao]','$dias','$postDados[hora1]','$postDados[hora2]',1)";
+				$querySql ="INSERT INTO `agendamentos`(`central`, `porta`, `acao`, `dias`, `hora1`, `hora2`, `status`) VALUES ('$ip','$porta','$postDados[acao]','$dias','$postDados[hora1]','$postDados[hora2]',1)";
 				
 				if(!$query = $mysqli->query($querySql)){
 					echo "Errorcode: ".$mysqli->errno;
@@ -1169,7 +1171,7 @@
 				<div >
 					<p style='margin:10px 0 0 0; font-size:18px;'>
 					<i class='fa fa-' aria-hidden='true' style='font-size:22px;color:whrite;margin:0px 0 0 0 ;'></i>
-					Inserir Cômodo
+					Novo Cômodo
 					</p>
 				</div>
 			</div>
@@ -1181,7 +1183,7 @@
 				<div >
 					<p style='margin:10px 0 0 0; font-size:18px;'>
 					<i class='fa fa' aria-hidden='true' style='font-size:22px;color:whrite;margin:0px 0 0 0 ;'></i>
-						Configurar Ação
+						Novo Controle
 					</p>
 				</div>
 			</div>
@@ -1204,7 +1206,7 @@
 				<div >
 					<p style='margin:10px 0 0 0; font-size:18px;'>
 					<i class='fa fa' aria-hidden='true' style='font-size:22px;color:whrite;margin:0px 0 0 0 ;'></i>
-					Parametros Gerais
+					Parâmetros Gerais
 					</p>
 				</div>
 			</div>
@@ -1284,7 +1286,7 @@
 							$a =$resultado['valor']; 
 						}
 						$valor = explode(";",$a);
-						$identificacao2 ="<img src='ico/termometro.png' style='width:20px;'/> $valor[1] ºC"; 
+						$identificacao2 ="<img src='ico/termometro.png' style='width:28px;'/> $valor[1] ºC"; 
 						$v = "<img src='ico/nuvem.png' style='width:35px;'/> $valor[2] %";
 						echo"
 							<table>
@@ -1309,7 +1311,7 @@
 								$a =$resultado['valor']; 
 							}
 							$valor = explode(";",$a);
-							if($valor[1] < 249){
+							if($valor[1] < $nivelGas){
 								$identificacao3 ="Gás-Fumaça"; 
 								$v2= "Ausente:($valor[1])";
 							}else{
@@ -1377,7 +1379,7 @@
 								$span
 							</td>
 							<td>
-								<a href='http://127.0.0.1/arduino/index.php?id=configurar&setor=Agendamento&exec=novoAgendamento&central=$central|$porta'><img src=\"ico/relogio.png\" width=\"30\" height=\"30\" alt=\"Agendar Tarefa\" title=\"Agendar Tarefa\"></a>
+								<a href='?id=configurar&setor=Agendamento&exec=novoAgendamento&central=$central|$porta'><img src=\"ico/relogio.png\" width=\"30\" height=\"30\" alt=\"Agendar Tarefa\" title=\"Agendar Tarefa\"></a>
 							</td>
 						</tr>";
 				}
@@ -1428,7 +1430,7 @@
 								$span
 							</td>
 							<td>
-								<a href='http://127.0.0.1/arduino/index.php?id=configurar&setor=Agendamento&exec=novoAgendamento&central=$central|$porta'><img src=\"ico/relogio.png\" width=\"30\" height=\"30\" alt=\"Agendar Tarefa\" title=\"Agendar Tarefa\"></a>
+								<a href='?id=configurar&setor=Agendamento&exec=novoAgendamento&central=$central|$porta'><img src=\"ico/relogio.png\" width=\"30\" height=\"30\" alt=\"Agendar Tarefa\" title=\"Agendar Tarefa\"></a>
 							</td>
 						</tr>";
 				}

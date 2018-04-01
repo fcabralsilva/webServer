@@ -46,7 +46,7 @@ if(isset($get['id'])){
 }
 if(isset($get['sensor'])){
 	//EXEMPLO DE REQUEST GET - http://127.0.0.1/arduino/gravar.php?sensor=dht11&valor=dht11;32;89&central=192.168.0.177&porta=10
-	$querySql = "INSERT INTO `sensores`(`data`, `valor`, `central`, `porta`,`tipo`) VALUES ('$data','$get[valor]','$get[central]','$get[porta]','$get[sensor]')";
+	$querySql = "INSERT INTO `sensores`(`data`, `valor`, `central`, `porta`,`tipo`) VALUES ('$data','$get[valor]','$get[central]','$get[p]','$get[sensor]')";
 	$query = $mysqli->query($querySql);
 	}
 $querySql = "SELECT * from log order by data desc LIMIT 100 ";

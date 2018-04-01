@@ -20,12 +20,12 @@ function verificarCheckBox(nome,central,porta) {
 		}else{
 			if (check[i].checked == true){ 
 				var url = "http://"+central+"/?porta="+porta+"&acao=liga&central="+central;
-				var url2 = "http://127.0.0.1/web/gravar.php?porta="+porta+"&acao=liga&central="+central;
+				var url2 = "http://192.168.0.166/web/gravar.php?porta="+porta+"&acao=liga&central="+central;
 				gravaBanco(url2);
 				comandoCentral(url);
 			}  else {
 				var url = "http://"+central+"/?porta="+porta+"&acao=desligar&central="+central;
-				var url2 = "http://127.0.0.1/web/gravar.php?porta="+porta+"&acao=desligar&central="+central;
+				var url2 = "http://192.168.0.166/web/gravar.php?porta="+porta+"&acao=desligar&central="+central;
 				gravaBanco(url2);
 				comandoCentral(url);
 			}

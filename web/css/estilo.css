@@ -46,6 +46,17 @@ font-family: Verdana,sans-serif;
 	border-radius: 15px;
 	box-shadow: 0 8px 8px 0 rgba(0, 1, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
 }
+#itemDivPainel2 {
+	--margin:15px 0 0 0 ;
+	--padding:15px;
+	--background-color: rgba(0, 255, 188, 0.09);
+	height:auto;
+	width:430px;
+	float:cente;
+	text-align:center;
+	border-radius: 5px;
+	box-shadow: 0 8px 8px 0 rgba(0, 1, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+}
 #itemDivDetalhe {
 	margin:0 auto ;
 	padding:1px;
@@ -66,9 +77,11 @@ font-family: Verdana,sans-serif;
 	--box-shadow: 0 4px 8px 0 rgba(0, 1, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
 }
 tr:hover{
-	top:-2px;
-	box-shadow:2px 10px 15px #f3f3f3
+	--top:-2px;
+	--box-shadow:2px 10px 15px #f3f3f3;
+	
 }
+
 #trnone:hover{
 	
 	box-shadow:none;
@@ -80,8 +93,8 @@ a:link, a:visited{
 }
 td{
 	border:0px solid;
-	width:500px;
-	text-align: center;
+	width:40%;
+	text-align: left;
 	padding:5px;
 }.switch {
 	position: relative;
@@ -169,9 +182,10 @@ table {
 tr{
 font-size: 12px;
 border-radius: 5px;
-box-shadow: 0 4px 8px 0 rgba(0, 1, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+--box-shadow: 0 4px 8px 0 rgba(0, 1, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
 }
 #alerta {
 	text-align: left;
 	color:red;
 	}
+}
